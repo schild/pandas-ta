@@ -16,12 +16,11 @@ def _camelCase2Title(x: str):
 
 def category_files(category: str) -> list:
     """Helper function to return all filenames in the category directory."""
-    files = [
+    return [
         x.stem
         for x in list(Path(f"pandas_ta/{category}/").glob("*.py"))
         if x.stem != "__init__"
     ]
-    return files
 
 
 def get_drift(x: int) -> int:
@@ -42,7 +41,7 @@ def is_datetime_ordered(df: DataFrame or Series) -> bool:
     except RuntimeWarning:
         pass
     finally:
-        return True if index_is_datetime and ordered else False
+        return bool(index_is_datetime and ordered)
 
 
 def is_percent(x: int or float) -> bool:
@@ -131,6 +130,6 @@ def unsigned_differences(series: Series, amount: int = None, **kwargs) -> Series
 
 def verify_series(series: Series, min_length: int = None) -> Series:
     """If a Pandas Series and it meets the min_length of the indicator return it."""
-    has_length = min_length is not None and isinstance(min_length, int)
     if series is not None and isinstance(series, Series):
+        has_length = min_length is not None and isinstance(min_length, int)
         return None if has_length and series.size < min_length else series

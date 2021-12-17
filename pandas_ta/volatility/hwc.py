@@ -93,19 +93,13 @@ def hwc(close, na=None, nb=None, nc=None, nd=None, scalar=None, channel_eval=Non
         hwc_width.name = "HWW"
         hwc_pctwidth.name = "HWPCT"
 
-    # Prepare DataFrame to return
-    if channel_eval:
         data = {hwc.name: hwc, hwc_upper.name: hwc_upper, hwc_lower.name: hwc_lower,
                 hwc_width.name: hwc_width, hwc_pctwidth.name: hwc_pctwidth}
-        df = DataFrame(data)
-        df.name = "HWC"
-        df.category = hwc.category
     else:
         data = {hwc.name: hwc, hwc_upper.name: hwc_upper, hwc_lower.name: hwc_lower}
-        df = DataFrame(data)
-        df.name = "HWC"
-        df.category = hwc.category
-
+    df = DataFrame(data)
+    df.name = "HWC"
+    df.category = hwc.category
     return df
 
 

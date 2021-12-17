@@ -18,9 +18,8 @@ def td_seq(close, asint=None, offset=None, **kwargs):
 
         if index is None:
             return series.count()
-        else:
-            s = series[series.index > index]
-            return s.count()
+        s = series[series.index > index]
+        return s.count()
 
     def calc_td(series: Series, direction: str, show_all: bool):
         td_bool = series.diff(4) > 0 if direction=="up" else series.diff(4) < 0

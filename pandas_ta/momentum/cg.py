@@ -12,7 +12,7 @@ def cg(close, length=None, offset=None, **kwargs):
     if close is None: return
 
     # Calculate Result
-    coefficients = [length - i for i in range(0, length)]
+    coefficients = [length - i for i in range(length)]
     numerator = -close.rolling(length).apply(weights(coefficients), raw=True)
     cg = numerator / close.rolling(length).sum()
 

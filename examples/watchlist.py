@@ -49,7 +49,7 @@ def colors(colors: str = None, default: str = "GrRd"):
         "kc": ["purple", "fuchsia", "purple"],
     }
     aliases["default"] = aliases[default]
-    if colors in aliases.keys():
+    if colors in aliases:
         return aliases[colors]
     return aliases["default"]
 
@@ -145,16 +145,11 @@ class Watchlist(object):
             _title = kwargs.pop("title", f"{df.ticker}   {_time}   [{self.ds_name}]")
 
             col = kwargs.pop("close", "close")
-            if mas:
-                # df.ta.strategy(self.strategy, append=True)
-                price = df[[col, "SMA_10", "SMA_20", "SMA_50", "SMA_200"]]
-            else:
-                price = df[col]
-
+            price = df[[col, "SMA_10", "SMA_20", "SMA_50", "SMA_200"]] if mas else df[col]
             if _kind is None:
                 price.tail(_last).plot(figsize=_figsize, color=_colors, linewidth=2, title=_title, grid=_grid, alpha=_alpha)
             else:
-                print(f"[X] Plot kind not implemented")
+                print('[X] Plot kind not implemented')
                 return
 
 
@@ -225,7 +220,7 @@ class Watchlist(object):
         # Later check dict has string keys and DataFrame values
         if value is not None and isinstance(value, dict):
             if self.verbose:
-                print(f"[+] New data")
+                print('[+] New data')
             self._data = value
         else:
             self._data = None
@@ -295,10 +290,7 @@ class Watchlist(object):
 
     @verbose.setter
     def verbose(self, value: bool) -> None:
-        if isinstance(value, bool):
-            self._verbose = bool(value)
-        else:
-            self._verbose = False
+        self._verbose = bool(value) if isinstance(value, bool) else False
 
     def indicators(self, *args, **kwargs) -> any:
         """Returns the list of indicators that are available with Pandas Ta."""

@@ -14,9 +14,15 @@ def vwap(high, low, close, volume, anchor=None, offset=None, **kwargs):
 
     typical_price = hlc3(high=high, low=low, close=close)
     if not is_datetime_ordered(volume):
-        print(f"[!] VWAP volume series is not datetime ordered. Results may not be as expected.")
+        print(
+            '[!] VWAP volume series is not datetime ordered. Results may not be as expected.'
+        )
+
     if not is_datetime_ordered(typical_price):
-        print(f"[!] VWAP price series is not datetime ordered. Results may not be as expected.")
+        print(
+            '[!] VWAP price series is not datetime ordered. Results may not be as expected.'
+        )
+
 
     # Calculate Result
     wp = typical_price * volume

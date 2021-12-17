@@ -26,11 +26,12 @@ def tsignals(trend, asbool=None, trend_reset=0, trade_offset=None, drift=None, o
         exits = exits.astype(bool)
 
     data = {
-        f"TS_Trends": trends,
-        f"TS_Trades": trades,
-        f"TS_Entries": entries,
-        f"TS_Exits": exits,
+        'TS_Trends': trends,
+        'TS_Trades': trades,
+        'TS_Entries': entries,
+        'TS_Exits': exits,
     }
+
     df = DataFrame(data, index=trends.index)
 
     # Offset
@@ -44,7 +45,7 @@ def tsignals(trend, asbool=None, trend_reset=0, trade_offset=None, drift=None, o
         df.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name & Category
-    df.name = f"TS"
+    df.name = 'TS'
     df.category = "trend"
 
     return df

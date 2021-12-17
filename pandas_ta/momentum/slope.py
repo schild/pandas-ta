@@ -8,8 +8,8 @@ def slope( close, length=None, as_angle=None, to_degrees=None, vertical=None, of
     """Indicator: Slope"""
     # Validate arguments
     length = int(length) if length and length > 0 else 1
-    as_angle = True if isinstance(as_angle, bool) else False
-    to_degrees = True if isinstance(to_degrees, bool) else False
+    as_angle = isinstance(as_angle, bool)
+    to_degrees = isinstance(to_degrees, bool)
     close = verify_series(close, length)
     offset = get_offset(offset)
 

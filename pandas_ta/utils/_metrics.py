@@ -39,7 +39,7 @@ def calmar_ratio(close: Series, method: str = "percent", years: int = 3) -> floa
     >>> result = ta.calmar_ratio(close, method="percent", years=3)
     """
     if years <= 0:
-        print(f"[!] calmar_ratio 'years' argument must be greater than zero.")
+        print("[!] calmar_ratio 'years' argument must be greater than zero.")
         return
     close = verify_series(close)
 
@@ -125,7 +125,7 @@ def max_drawdown(close: Series, method:str = None, all:bool = False) -> float:
     }
     if all: return max_dd_
 
-    if isinstance(method, str) and method in max_dd_.keys():
+    if isinstance(method, str) and method in max_dd_:
         return max_dd_[method]
     return max_dd_["dollar"]
 
@@ -161,8 +161,7 @@ def optimal_leverage(
     # sharpe = mean_excess_return / period_std
     opt_leverage = (period_std ** -2) * mean_excess_return
 
-    amount = int(capital * opt_leverage)
-    return amount
+    return int(capital * opt_leverage)
 
 
 def pure_profit_score(close: Series) -> Tuple[float, int]:
@@ -202,10 +201,9 @@ def sharpe_ratio(close: Series, benchmark_rate: float = 0.0, log: bool = False, 
 
     if use_cagr:
         return cagr(close) / volatility(close, returns, log=log)
-    else:
-        period_mu = period * returns.mean()
-        period_std = npSqrt(period) * returns.std()
-        return (period_mu - benchmark_rate) / period_std
+    period_mu = period * returns.mean()
+    period_std = npSqrt(period) * returns.std()
+    return (period_mu - benchmark_rate) / period_std
 
 
 def sortino_ratio(close: Series, benchmark_rate: float = 0.0, log: bool = False) -> float:

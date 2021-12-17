@@ -26,7 +26,7 @@ def pvt(close, volume, drift=None, offset=None, **kwargs):
         pvt.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name and Categorize it
-    pvt.name = f"PVT"
+    pvt.name = 'PVT'
     pvt.category = "volume"
 
     return pvt

@@ -36,7 +36,7 @@ def er(close, length=None, drift=None, offset=None, **kwargs):
 
     signal_indicators = kwargs.pop("signal_indicators", False)
     if signal_indicators:
-        signalsdf = concat(
+        return concat(
             [
                 DataFrame({er.name: er}),
                 signals(
@@ -53,8 +53,6 @@ def er(close, length=None, drift=None, offset=None, **kwargs):
             ],
             axis=1,
         )
-
-        return signalsdf
     else:
         return er
 

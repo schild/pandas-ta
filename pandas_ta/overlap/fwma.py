@@ -6,7 +6,7 @@ def fwma(close, length=None, asc=None, offset=None, **kwargs):
     """Indicator: Fibonacci's Weighted Moving Average (FWMA)"""
     # Validate Arguments
     length = int(length) if length and length > 0 else 10
-    asc = asc if asc else True
+    asc = asc or True
     close = verify_series(close, length)
     offset = get_offset(offset)
 

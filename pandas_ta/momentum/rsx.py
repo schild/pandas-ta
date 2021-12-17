@@ -24,23 +24,17 @@ def rsx(close, length=None, drift=None, offset=None, **kwargs):
 
     # Calculate Result
     m = close.size
-    result = [npNaN for _ in range(0, length - 1)] + [0]
+    result = [npNaN for _ in range(length - 1)] + [0]
     for i in range(length, m):
         if f90 == 0:
             f90 = 1.0
             f0 = 0.0
-            if length - 1.0 >= 5:
-                f88 = length - 1.0
-            else:
-                f88 = 5.0
+            f88 = length - 1.0 if length >= 6 else 5.0
             f8 = 100.0 * close.iloc[i]
             f18 = 3.0 / (length + 2.0)
             f20 = 1.0 - f18
         else:
-            if f88 <= f90:
-                f90 = f88 + 1
-            else:
-                f90 = f90 + 1
+            f90 = f88 + 1 if f88 <= f90 else f90 + 1
             f10 = f8
             f8 = 100 * close.iloc[i]
             v8 = f8 - f10
@@ -70,10 +64,8 @@ def rsx(close, length=None, drift=None, offset=None, **kwargs):
 
         if f88 < f90 and v20 > 0.0000000001:
             v4 = (v14 / v20 + 1.0) * 50.0
-            if v4 > 100.0:
-                v4 = 100.0
-            if v4 < 0.0:
-                v4 = 0.0
+            v4 = min(v4, 100.0)
+            v4 = max(v4, 0.0)
         else:
             v4 = 50.0
         result.append(v4)
@@ -95,7 +87,7 @@ def rsx(close, length=None, drift=None, offset=None, **kwargs):
 
     signal_indicators = kwargs.pop("signal_indicators", False)
     if signal_indicators:
-        signalsdf = concat(
+        return concat(
             [
                 DataFrame({rsx.name: rsx}),
                 signals(
@@ -112,8 +104,6 @@ def rsx(close, length=None, drift=None, offset=None, **kwargs):
             ],
             axis=1
         )
-
-        return signalsdf
     else:
         return rsx
 
