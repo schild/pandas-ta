@@ -34,7 +34,7 @@ def bop(open_, high, low, close, scalar=None, talib=None, offset=None, **kwargs)
         bop.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name and Categorize it
-    bop.name = f"BOP"
+    bop.name = 'BOP'
     bop.category = "momentum"
 
     return bop

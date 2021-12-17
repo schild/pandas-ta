@@ -34,26 +34,20 @@ def stc(close, tclength=None, fast=None, slow=None, factor=None, offset=None, **
         if ma1 is None or ma2 is None: return
         # Calculate Result based on external feeded series
         xmacd = ma1 - ma2
-        # invoke shared calculation
-        pff, pf = schaff_tc(close, xmacd, tclength, factor)
-
     elif isinstance(osc, Series):
         osc = verify_series(osc, _length)
         if osc is None: return
         # Calculate Result based on feeded oscillator
         # (should be ranging around 0 x-axis)
         xmacd = osc
-        # invoke shared calculation
-        pff, pf = schaff_tc(close, xmacd, tclength, factor)
-
     else:
         # Calculate Result .. (traditionel/full)
         # MACD line
         fastma = ema(close, length=fast)
         slowma = ema(close, length=slow)
         xmacd = fastma - slowma
-        # invoke shared calculation
-        pff, pf = schaff_tc(close, xmacd, tclength, factor)
+    # invoke shared calculation
+    pff, pf = schaff_tc(close, xmacd, tclength, factor)
 
     # Resulting Series
     stc = Series(pff, index=close.index)

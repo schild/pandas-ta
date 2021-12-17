@@ -39,10 +39,7 @@ def xsignals(signal, xa, xb, above:bool=True, long:bool=True, asbool:bool=None, 
     df = tsignals(trends, **tskwargs)
 
     # Offset handled by tsignals
-    DataFrame({
-        f"XS_LONG": df.TS_Trends,
-        f"XS_SHORT": 1 - df.TS_Trends
-    })
+    DataFrame({'XS_LONG': df.TS_Trends, 'XS_SHORT': 1 - df.TS_Trends})
 
 
     # Handle fills
@@ -52,7 +49,7 @@ def xsignals(signal, xa, xb, above:bool=True, long:bool=True, asbool:bool=None, 
         df.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name & Category
-    df.name = f"XS"
+    df.name = 'XS'
     df.category = "trend"
 
     return df

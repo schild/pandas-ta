@@ -79,17 +79,16 @@ def fibonacci(n: int = 2, **kwargs: dict) -> npNdArray:
         a, b = 1, 1
 
     result = npArray([a])
-    for _ in range(0, n):
+    for _ in range(n):
         a, b = b, a + b
         result = npAppend(result, a)
 
     weighted = kwargs.pop("weighted", False)
-    if weighted:
-        fib_sum = npSum(result)
-        if fib_sum > 0:
-            return result / fib_sum
-        else:
-            return result
+    if not weighted:
+        return result
+    fib_sum = npSum(result)
+    if fib_sum > 0:
+        return result / fib_sum
     else:
         return result
 
@@ -127,12 +126,11 @@ def linear_regression(x: Series, y: Series) -> dict:
 def log_geometric_mean(series: Series) -> float:
     """Returns the Logarithmic Geometric Mean"""
     n = series.size
-    if n < 2: return 0
-    else:
+    if n >= 2:
         series = series.fillna(0) + 1
         if npAll(series > 0):
             return npExp(npLog(series).sum() / n) - 1
-        return 0
+    if n < 2: return 0
 
 
 def pascals_triangle(n: int = None, **kwargs: dict) -> npNdArray:
@@ -146,7 +144,7 @@ def pascals_triangle(n: int = None, **kwargs: dict) -> npNdArray:
     n = int(npFabs(n)) if n is not None else 0
 
     # Calculation
-    triangle = npArray([combination(n=n, r=i) for i in range(0, n + 1)])
+    triangle = npArray([combination(n=n, r=i) for i in range(n + 1)])
     triangle_sum = npSum(triangle)
     triangle_weights = triangle / triangle_sum
     inverse_weights = 1 - triangle_weights
@@ -178,18 +176,17 @@ def symmetric_triangle(n: int = None, **kwargs: dict) -> Optional[List[int]]:
 
     if n > 2:
         if n % 2 == 0:
-            front = [i + 1 for i in range(0, mfloor(n / 2))]
+            front = [i + 1 for i in range(mfloor(n / 2))]
             triangle = front + front[::-1]
         else:
-            front = [i + 1 for i in range(0, mfloor(0.5 * (n + 1)))]
+            front = [i + 1 for i in range(mfloor(0.5 * (n + 1)))]
             triangle = front.copy()
             front.pop()
             triangle += front[::-1]
 
     if kwargs.pop("weighted", False) and isinstance(triangle, list):
         triangle_sum = npSum(triangle)
-        triangle_weights = triangle / triangle_sum
-        return triangle_weights
+        return triangle / triangle_sum
 
     return triangle
 
@@ -267,9 +264,8 @@ def _linear_regression_sklearn(x: Series, y: Series) -> dict:
     r = lr.score(X, y=y)
     a, b = lr.intercept_, lr.coef_[0]
 
-    result = {
+    return {
         "a": a, "b": b, "r": r,
         "t": r / npSqrt((1 - r * r) / (x.size - 2)),
         "line": a + b * x
     }
-    return result

@@ -14,7 +14,7 @@ def hma(close, length=None, offset=None, **kwargs):
     if close is None: return
 
     # Calculate Result
-    half_length = int(length / 2)
+    half_length = length // 2
     sqrt_length = int(npSqrt(length))
 
     wmaf = wma(close=close, length=half_length)

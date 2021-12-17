@@ -67,7 +67,7 @@ class Strategy:
 
         if self.name is None or not name_is_str:
             required_args.append(' - name. Must be a string. Example: "My TA". Note: "all" is reserved.')
-            has_name != has_name
+            False
 
         if self.ta is None:
             self.ta = None
@@ -75,10 +75,13 @@ class Strategy:
             # Check that all elements of the list are dicts.
             # Does not check if the dicts values are valid indicator kwargs
             # User must check indicator documentation for all indicators args.
-            is_ta = all([isinstance(_, dict) and len(_.keys()) > 0 for _ in self.ta])
+            is_ta = all(isinstance(_, dict) and len(_.keys()) > 0 for _ in self.ta)
         else:
-            s = " - ta. Format is a list of dicts. Example: [{'kind': 'sma', 'length': 10}]"
-            s += "\n       Check the indicator for the correct arguments if you receive this error."
+            s = (
+                " - ta. Format is a list of dicts. Example: [{'kind': 'sma', 'length': 10}]"
+                + "\n       Check the indicator for the correct arguments if you receive this error."
+            )
+
             required_args.append(s)
 
         if len(required_args) > 1:
@@ -123,36 +126,35 @@ class BasePandasObject(PandasObject):
 
     def __init__(self, df, **kwargs):
         if df.empty: return
-        if len(df.columns) > 0:
-            common_names = {
-                "Date": "date",
-                "Time": "time",
-                "Timestamp": "timestamp",
-                "Datetime": "datetime",
-                "Open": "open",
-                "High": "high",
-                "Low": "low",
-                "Close": "close",
-                "Adj Close": "adj_close",
-                "Volume": "volume",
-                "Dividends": "dividends",
-                "Stock Splits": "split",
-            }
-            # Preemptively drop the rows that are all NaNs
-            # Might need to be moved to AnalysisIndicators.__call__() to be
-            #   toggleable via kwargs.
-            # df.dropna(axis=0, inplace=True)
-            # Preemptively rename columns to lowercase
-            df.rename(columns=common_names, errors="ignore", inplace=True)
+        if len(df.columns) <= 0:
+            raise AttributeError('[X] No columns!')
+        common_names = {
+            "Date": "date",
+            "Time": "time",
+            "Timestamp": "timestamp",
+            "Datetime": "datetime",
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Adj Close": "adj_close",
+            "Volume": "volume",
+            "Dividends": "dividends",
+            "Stock Splits": "split",
+        }
+        # Preemptively drop the rows that are all NaNs
+        # Might need to be moved to AnalysisIndicators.__call__() to be
+        #   toggleable via kwargs.
+        # df.dropna(axis=0, inplace=True)
+        # Preemptively rename columns to lowercase
+        df.rename(columns=common_names, errors="ignore", inplace=True)
 
-            # Preemptively lowercase the index
-            index_name = df.index.name
-            if index_name is not None:
-                df.index.rename(index_name.lower(), inplace=True)
+        # Preemptively lowercase the index
+        index_name = df.index.name
+        if index_name is not None:
+            df.index.rename(index_name.lower(), inplace=True)
 
-            self._df = df
-        else:
-            raise AttributeError(f"[X] No columns!")
+        self._df = df
 
     def __call__(self, kind, *args, **kwargs):
         raise NotImplementedError()
@@ -381,49 +383,49 @@ class AnalysisIndicators(BasePandasObject):
         """Add prefix and/or suffix to the result columns"""
         if result is None:
             return
+        prefix = suffix = ""
+        delimiter = kwargs.setdefault("delimiter", "_")
+
+        if "prefix" in kwargs:
+            prefix = f"{kwargs['prefix']}{delimiter}"
+        if "suffix" in kwargs:
+            suffix = f"{delimiter}{kwargs['suffix']}"
+
+        if isinstance(result, pd.Series):
+            result.name = prefix + result.name + suffix
         else:
-            prefix = suffix = ""
-            delimiter = kwargs.setdefault("delimiter", "_")
-
-            if "prefix" in kwargs:
-                prefix = f"{kwargs['prefix']}{delimiter}"
-            if "suffix" in kwargs:
-                suffix = f"{delimiter}{kwargs['suffix']}"
-
-            if isinstance(result, pd.Series):
-                result.name = prefix + result.name + suffix
-            else:
-                result.columns = [prefix + column + suffix for column in result.columns]
+            result.columns = [prefix + column + suffix for column in result.columns]
 
     def _append(self, result=None, **kwargs) -> None:
         """Appends a Pandas Series or DataFrame columns to self._df."""
-        if "append" in kwargs and kwargs["append"]:
-            df = self._df
+        if "append" not in kwargs or not kwargs["append"]:
+            return
+        df = self._df
+        if df is None or result is None:
             if df is None or result is None: return
-            else:
-                simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
-                if "col_names" in kwargs and not isinstance(kwargs["col_names"], tuple):
-                    kwargs["col_names"] = (kwargs["col_names"],) # Note: tuple(kwargs["col_names"]) doesn't work
+        simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+        if "col_names" in kwargs and not isinstance(kwargs["col_names"], tuple):
+            kwargs["col_names"] = (kwargs["col_names"],) # Note: tuple(kwargs["col_names"]) doesn't work
 
-                if isinstance(result, pd.DataFrame):
-                    # If specified in kwargs, rename the columns.
-                    # If not, use the default names.
-                    if "col_names" in kwargs and isinstance(kwargs["col_names"], tuple):
-                        if len(kwargs["col_names"]) >= len(result.columns):
-                            for col, ind_name in zip(result.columns, kwargs["col_names"]):
-                                df[ind_name] = result.loc[:, col]
-                        else:
-                            print(f"Not enough col_names were specified : got {len(kwargs['col_names'])}, expected {len(result.columns)}.")
-                            return
-                    else:
-                        for i, column in enumerate(result.columns):
-                            df[column] = result.iloc[:, i]
+        if isinstance(result, pd.DataFrame):
+            # If specified in kwargs, rename the columns.
+            # If not, use the default names.
+            if "col_names" in kwargs and isinstance(kwargs["col_names"], tuple):
+                if len(kwargs["col_names"]) >= len(result.columns):
+                    for col, ind_name in zip(result.columns, kwargs["col_names"]):
+                        df[ind_name] = result.loc[:, col]
                 else:
-                    ind_name = (
-                        kwargs["col_names"][0] if "col_names" in kwargs and
-                        isinstance(kwargs["col_names"], tuple) else result.name
-                    )
-                    df[ind_name] = result
+                    print(f"Not enough col_names were specified : got {len(kwargs['col_names'])}, expected {len(result.columns)}.")
+                    return
+            else:
+                for i, column in enumerate(result.columns):
+                    df[column] = result.iloc[:, i]
+        else:
+            ind_name = (
+                kwargs["col_names"][0] if "col_names" in kwargs and
+                isinstance(kwargs["col_names"], tuple) else result.name
+            )
+            df[ind_name] = result
 
     def _check_na_columns(self, stdout: bool = True):
         """Returns the columns in which all it's values are na."""
@@ -437,23 +439,19 @@ class AnalysisIndicators(BasePandasObject):
         # Explicitly passing a pd.Series to override default.
         if isinstance(series, pd.Series):
             return series
-        # Apply default if no series nor a default.
         elif series is None:
             return df[self.adjusted] if self.adjusted is not None else None
-        # Ok.  So it's a str.
         elif isinstance(series, str):
-            # Return the df column since it's in there.
             if series in df.columns:
                 return df[series]
-            else:
-                # Attempt to match the 'series' because it was likely
-                # misspelled.
-                matches = df.columns.str.match(series, case=False)
-                match = [i for i, x in enumerate(matches) if x]
-                # If found, awesome.  Return it or return the 'series'.
-                cols = ", ".join(list(df.columns))
-                NOT_FOUND = f"[X] Ooops!!! It's {series not in df.columns}, the series '{series}' was not found in {cols}"
-                return df.iloc[:, match[0]] if len(match) else print(NOT_FOUND)
+            # Attempt to match the 'series' because it was likely
+            # misspelled.
+            matches = df.columns.str.match(series, case=False)
+            match = [i for i, x in enumerate(matches) if x]
+            # If found, awesome.  Return it or return the 'series'.
+            cols = ", ".join(list(df.columns))
+            NOT_FOUND = f"[X] Ooops!!! It's {series not in df.columns}, the series '{series}' was not found in {cols}"
+            return df.iloc[:, match[0]] if len(match) else print(NOT_FOUND)
 
     def _indicators_by_category(self, name: str) -> list:
         """Returns indicators by Categorical name."""
@@ -476,7 +474,7 @@ class AnalysisIndicators(BasePandasObject):
         verbose = kwargs.pop("verbose", False)
         if not isinstance(result, (pd.Series, pd.DataFrame)):
             if verbose:
-                print(f"[X] Oops! The result was not a Series or DataFrame.")
+                print('[X] Oops! The result was not a Series or DataFrame.')
             return self._df
         else:
             # Append only specific columns to the dataframe (via
@@ -545,7 +543,7 @@ class AnalysisIndicators(BasePandasObject):
             Returns nothing to the user.  Either adds or removes constant ranges
             from the working DataFrame.
         """
-        if isinstance(values, npNdarray) or isinstance(values, list):
+        if isinstance(values, (npNdarray, list)):
             if append:
                 for x in values:
                     self._df[f"{x}"] = x
@@ -585,7 +583,12 @@ class AnalysisIndicators(BasePandasObject):
         ]
 
         # Public non-indicator methods
-        ta_indicators = list((x for x in dir(pd.DataFrame().ta) if not x.startswith("_") and not x.endswith("_")))
+        ta_indicators = [
+            x
+            for x in dir(pd.DataFrame().ta)
+            if not x.startswith("_") and not x.endswith("_")
+        ]
+
 
         # Add Pandas TA methods and properties to be removed
         removed = helper_methods + ta_properties
@@ -679,7 +682,7 @@ class AnalysisIndicators(BasePandasObject):
         elif mode["all"]:
             ta = self.indicators(as_list=True, exclude=excluded)
         else:
-            print(f"[X] Not an available strategy.")
+            print('[X] Not an available strategy.')
             return None
 
         # Remove Custom indicators with "length" keyword when larger than the DataFrame
@@ -689,7 +692,7 @@ class AnalysisIndicators(BasePandasObject):
             _ = False
             if "length" in kwds and kwds["length"] > self._df.shape[0]: _ = True
             if _: removal.append(kwds)
-        if len(removal) > 0: [ta.remove(x) for x in removal]
+        if removal: [ta.remove(x) for x in removal]
 
         verbose = kwargs.pop("verbose", False)
         if verbose:
@@ -700,7 +703,7 @@ class AnalysisIndicators(BasePandasObject):
 
         timed = kwargs.pop("timed", False)
         results = []
-        use_multiprocessing = True if self.cores > 0 else False
+        use_multiprocessing = self.cores > 0
         has_col_names = False
 
         if timed:
@@ -708,10 +711,10 @@ class AnalysisIndicators(BasePandasObject):
 
         if use_multiprocessing and mode["custom"]:
             # Determine if the Custom Model has 'col_names' parameter
-            has_col_names = (True if len([
+            has_col_names = bool(len([
                 True for x in ta
                 if "col_names" in x and isinstance(x["col_names"], tuple)
-            ]) else False)
+            ]))
 
             if has_col_names:
                 use_multiprocessing = False
@@ -763,14 +766,14 @@ class AnalysisIndicators(BasePandasObject):
         else:
             # Without multiprocessing:
             if verbose:
-                _col_msg = f"[i] No mulitproccessing (cores = 0)."
+                _col_msg = '[i] No mulitproccessing (cores = 0).'
                 if has_col_names:
-                    _col_msg = f"[i] No mulitproccessing support for 'col_names' option."
+                    _col_msg = "[i] No mulitproccessing support for 'col_names' option."
                 print(_col_msg)
 
             if mode["custom"]:
                 if Imports["tqdm"] and verbose:
-                    pbar = tqdm(ta, f"[i] Progress")
+                    pbar = tqdm(ta, '[i] Progress')
                     for ind in pbar:
                         params = ind["params"] if "params" in ind and isinstance(ind["params"], tuple) else tuple()
                         getattr(self, ind["kind"])(*params, **{**ind, **kwargs})
@@ -780,7 +783,7 @@ class AnalysisIndicators(BasePandasObject):
                         getattr(self, ind["kind"])(*params, **{**ind, **kwargs})
             else:
                 if Imports["tqdm"] and verbose:
-                    pbar = tqdm(ta, f"[i] Progress")
+                    pbar = tqdm(ta, '[i] Progress')
                     for ind in pbar:
                         getattr(self, ind)(*tuple(), **kwargs)
                 else:

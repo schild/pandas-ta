@@ -12,12 +12,12 @@ def tos_stdevall(close, length=None, stds=None, ddof=None, offset=None, **kwargs
     # Validate Arguments
     stds = stds if isinstance(stds, list) and len(stds) > 0 else [1, 2, 3]
     if min(stds) <= 0: return
-    if not all(i < j for i, j in zip(stds, stds[1:])):
+    if any(i >= j for i, j in zip(stds, stds[1:])):
         stds = stds[::-1]
     ddof = int(ddof) if ddof and ddof >= 0 and ddof < length else 1
     offset = get_offset(offset)
 
-    _props = f"TOS_STDEVALL"
+    _props = 'TOS_STDEVALL'
     if length is None:
         length = close.size
     else:

@@ -29,7 +29,7 @@ def cdl_inside(open_, high, low, close, asbool=False, offset=None, **kwargs):
         inside.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name and Categorize it
-    inside.name = f"CDL_INSIDE"
+    inside.name = 'CDL_INSIDE'
     inside.category = "candles"
 
     return inside

@@ -20,11 +20,7 @@ def kc(high, low, close, length=None, scalar=None, mamode=None, offset=None, **k
 
     # Calculate Result
     use_tr = kwargs.pop("tr", True)
-    if use_tr:
-        range_ = true_range(high, low, close)
-    else:
-        range_ = high_low_range(high, low)
-
+    range_ = true_range(high, low, close) if use_tr else high_low_range(high, low)
     basis = ma(mamode, close, length=length)
     band = ma(mamode, range_, length=length)
 

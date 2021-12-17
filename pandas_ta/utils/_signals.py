@@ -14,11 +14,7 @@ def _above_below(series_a: Series, series_b: Series, above: bool = True, asint: 
     series_b.apply(zero)
 
     # Calculate Result
-    if above:
-        current = series_a >= series_b
-    else:
-        current = series_a <= series_b
-
+    current = series_a >= series_b if above else series_a <= series_b
     if asint:
         current = current.astype(int)
 

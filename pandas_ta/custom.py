@@ -71,13 +71,11 @@ def get_module_functions(module):
             "func2_name": func2,...
         }
     """
-    module_functions = {}
-
-    for name, item in vars(module).items():
-        if isinstance(item, types.FunctionType):
-            module_functions[name] = item
-
-    return module_functions
+    return {
+        name: item
+        for name, item in vars(module).items()
+        if isinstance(item, types.FunctionType)
+    }
 
 
 def import_dir(path, verbose=True):
@@ -114,10 +112,10 @@ def import_dir(path, verbose=True):
             fcn_callable = module_functions.get(module_name, None)
             fcn_method_callable = module_functions.get(f"{module_name}_method", None)
 
-            if fcn_callable == None:
+            if fcn_callable is None:
                 print(f"[X] Unable to find a function named '{module_name}' in the module '{module_name}.py'.")
                 continue
-            if fcn_method_callable == None:
+            if fcn_method_callable is None:
                 missing_method = f"{module_name}_method"
                 print(f"[X] Unable to find a method function named '{missing_method}' in the module '{module_name}.py'.")
                 continue

@@ -30,7 +30,7 @@ def obv(close, volume, talib=None, offset=None, **kwargs):
         obv.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name and Categorize it
-    obv.name = f"OBV"
+    obv.name = 'OBV'
     obv.category = "volume"
 
     return obv

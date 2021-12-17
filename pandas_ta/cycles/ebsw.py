@@ -29,7 +29,7 @@ def ebsw(close, length=None, bars=None, offset=None, **kwargs):
 
     # Calculate Result
     m = close.size
-    result = [npNaN for _ in range(0, length - 1)] + [0]
+    result = [npNaN for _ in range(length - 1)] + [0]
     for i in range(length, m):
         # HighPass filter cyclic components whose periods are shorter than Duration input
         alpha1 = (1 - npSin(360 / length)) / npCos(360 / length)

@@ -49,7 +49,7 @@ def rsi(close, length=None, scalar=None, talib=None, drift=None, offset=None, **
 
     signal_indicators = kwargs.pop("signal_indicators", False)
     if signal_indicators:
-        signalsdf = concat(
+        return concat(
             [
                 DataFrame({rsi.name: rsi}),
                 signals(
@@ -66,8 +66,6 @@ def rsi(close, length=None, scalar=None, talib=None, drift=None, offset=None, **
             ],
             axis=1,
         )
-
-        return signalsdf
     else:
         return rsi
 

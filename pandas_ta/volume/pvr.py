@@ -20,7 +20,7 @@ def pvr(close, volume):
     pvr_.loc[(close_diff < 0) & (volume_diff < 0)]   = 4
 
     # Name and Categorize it
-    pvr_.name = f"PVR"
+    pvr_.name = 'PVR'
     pvr_.category = "volume"
 
     return pvr_

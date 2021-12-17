@@ -70,7 +70,7 @@ def macd(close, fast=None, slow=None, signal=None, talib=None, offset=None, **kw
 
     signal_indicators = kwargs.pop("signal_indicators", False)
     if signal_indicators:
-        signalsdf = concat(
+        return concat(
             [
                 df,
                 signals(
@@ -98,8 +98,6 @@ def macd(close, fast=None, slow=None, signal=None, talib=None, offset=None, **kw
             ],
             axis=1,
         )
-
-        return signalsdf
     else:
         return df
 

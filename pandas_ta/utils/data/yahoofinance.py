@@ -81,7 +81,7 @@ def yf(ticker: str, **kwargs):
     if not Imports["yfinance"]:
         print(f"[X] Please install yfinance to use this method. (pip install yfinance)")
         return
-    if Imports["yfinance"] and ticker is not None:
+    if ticker is not None:
         import yfinance as yfra
         yfra.pdr_override()
 
@@ -352,7 +352,7 @@ def yf(ticker: str, **kwargs):
 
                 if kind not in _all: print(f"\n{ticker_info['symbol']}")
                 if isinstance(itm, bool) and itm: print("\n====  ITM Option Chains    " + div)
-                elif isinstance(itm, bool) and not itm: print("\n====  OTM Option Chains    " + div)
+                elif isinstance(itm, bool): print("\n====  OTM Option Chains    " + div)
                 else: print("\n====  Option Chains        " + div)
                 print(opt_expirations_str)
 

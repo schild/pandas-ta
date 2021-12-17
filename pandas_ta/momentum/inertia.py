@@ -10,8 +10,8 @@ def inertia(close=None, high=None, low=None, length=None, rvi_length=None, scala
     length = int(length) if length and length > 0 else 20
     rvi_length = int(rvi_length) if rvi_length and rvi_length > 0 else 14
     scalar = float(scalar) if scalar and scalar > 0 else 100
-    refined = False if refined is None else True
-    thirds = False if thirds is None else True
+    refined = refined is not None
+    thirds = thirds is not None
     mamode = mamode if isinstance(mamode, str) else "ema"
     _length = max(length, rvi_length)
     close = verify_series(close, _length)

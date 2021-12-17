@@ -15,7 +15,7 @@ def sinwma(close, length=None, offset=None, **kwargs):
     if close is None: return
 
     # Calculate Result
-    sines = Series([npSin((i + 1) * npPi / (length + 1)) for i in range(0, length)])
+    sines = Series([npSin((i + 1) * npPi / (length + 1)) for i in range(length)])
     w = sines / sines.sum()
 
     sinwma = close.rolling(length, min_periods=length).apply(weights(w), raw=True)

@@ -26,7 +26,7 @@ def pvol(close, volume, offset=None, **kwargs):
         pvol.fillna(method=kwargs["fill_method"], inplace=True)
 
     # Name and Categorize it
-    pvol.name = f"PVOL"
+    pvol.name = 'PVOL'
     pvol.category = "volume"
 
     return pvol
